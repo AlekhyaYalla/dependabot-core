@@ -60,6 +60,7 @@ module Dependabot
           end
         end
 
+        dependency_set.dependencies.select{ |dependency| prefer_lockfile_source(dependency) }
         dependency_set.dependencies.sort_by(&:name)
       end
 
@@ -191,6 +192,20 @@ module Dependabot
           matches[:namespace],
           matches[:name] || name
         ]
+      end
+
+      def prefer_lockfile_source(dependency)
+        return dependency if dependency.requirements.count == 1
+
+        lockfile_requirement = dependency.requirements.select{ |requirement| requirement[:source][:type] == "lockfile" }.first
+        provider_requirement = dependency.requirements.select{ |requirement| requirement[:source][:type] == "provider" }.first
+
+        if lockfile_requirement[:source][:registry_hostname] == provider_requirement[:source][:registry_hostname] &&
+           lockfile_requirement[:source][:module_identifier] == lockfile_requirement[:source][:module_identifier]
+          return dependency.requirements.select!{ |requirement| requirement == lockfile_requirement }
+        end
+
+        dependency
       end
 
       def registry_source_details_from(source_string)
