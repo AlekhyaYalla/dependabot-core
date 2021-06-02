@@ -69,6 +69,8 @@ module Dependabot
                      "modules/#{dependency.name}/#{dependency.version}"
                    elsif type == "provider"
                      "providers/#{dependency.name}/#{dependency.version}"
+                   elsif type == "lockfile"
+                     "providers/#{dependency.name}/#{dependency.version}"
                    else
                      raise "Invalid source type"
                    end

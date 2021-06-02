@@ -93,7 +93,7 @@ module Dependabot
       end
 
       def latest_version_for_provider_dependency
-        return unless provider_dependency?
+        return unless provider_dependency? || lockfile_dependency?
 
         return @latest_version_for_provider_dependency if @latest_version_for_provider_dependency
 
