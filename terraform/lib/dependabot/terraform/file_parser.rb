@@ -140,17 +140,18 @@ module Dependabot
         )
       end
       
-      def build_lockfile_dependency(file, provider_source, details)
-        version_req = details["version"]&.strip
+      def build_lockfile_dependency(file, provider_source, details = {})
+        current_version = details["version"]&.strip
+        version_req = details["constraints"]&.strip
         hostname, namespace, name = provider_source_from(provider_source, name)
         dependency_name = "#{namespace}/#{name}"
 
         Dependency.new(
-          name: file.name,
-          version: version_req,
+          name: dependency_name,
+          version: determine_version_for(hostname, namespace, name, version_req),
           package_manager: "terraform",
           requirements: [
-            requirement: version_req,
+            requirement: current_version,
             groups: [],
             file: file.name,
             source: {
